@@ -21,6 +21,16 @@ namespace Influence.Controllers
             _context = context;
         }
 
+        public UsersController()
+        {
+
+        }
+
+        public async Task<IActionResult> Get()
+        {
+            var results = await
+        }
+
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()

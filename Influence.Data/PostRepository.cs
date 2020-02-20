@@ -1,23 +1,25 @@
 ﻿using Influence.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Influence.Data
 {
-    public class UserRepository : IUserRepository
+    public class PostRepository
     {
         private readonly InfluenceContext _context;
         private readonly ILogger<UserRepository> _logger;
 
-        public UserRepository(InfluenceContext context, ILogger<UserRepository> logger)
-        {
+        public PostRepository(InfluenceContext context, ILogger<UserRepository> logger)
+        {        
             _context = context;
             _logger = logger;
         }
 
-        public void Add(User entity)
+        public void Add(Post entity)
         {
             _logger.LogInformation($"Adding an object of type {entity.GetType()} to the context.");
             _context.Add(entity);
@@ -26,7 +28,7 @@ namespace Influence.Data
         public void Delete(User entity)
         {
             _logger.LogInformation($"Removing an object of type {entity.GetType()} to the context.");
-            _context.Remove(entity);
+            _context.Add(entity);
         }
 
         public async Task<bool> SaveChangesAsync()
@@ -37,14 +39,9 @@ namespace Influence.Data
             return (await _context.SaveChangesAsync()) > 0;
         }
 
-        public async Task<List<User>> GetAllUsersAsync(bool includPosts = false)
+        public async Task<List<User>> GetAllPostAsync(bool includeComment = false)
         {
             return await _context.Users.ToListAsync();
-        }
-
-        public async Task<User> GetUserAsync(int id)
-        {
-            return await _context.Users.FindAsync(id);
         }
     }
 }

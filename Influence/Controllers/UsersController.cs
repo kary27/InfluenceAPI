@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Influence.Data;
 using Influence.Domain.Entities;
+using AutoMapper;
 
 namespace Influence.Controllers
 {
@@ -14,27 +15,28 @@ namespace Influence.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly IUserRepository _repository;
         private readonly InfluenceContext _context;
 
-        public UsersController(InfluenceContext context)
+        public UsersController(IUserRepository repository, InfluenceContext context, IMapper mapper)
         {
+            _repository = repository;
             _context = context;
-        }
-
-        public UsersController()
-        {
-
-        }
-
-        public async Task<IActionResult> Get()
-        {
-            var results = await
         }
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<List<User>>> GetUsers()
         {
+            try
+            {
+                var results = await _repository.GetAllUsersAsync();
+
+                return results;
+            }
+            catch (Exception){
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+            }
             return await _context.Users.ToListAsync();
         }
 

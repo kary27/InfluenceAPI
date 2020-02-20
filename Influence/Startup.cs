@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Influence.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 
 namespace Influence
 {
@@ -28,6 +30,8 @@ namespace Influence
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddAutoMapper(typeof(Startup));
+            services.AddSingleton<IUserRepository, UserRepository>();
             services.AddDbContext<InfluenceContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("InfluenceConnection")));
         }
 

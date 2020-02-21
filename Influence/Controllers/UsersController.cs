@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Influence.Data;
 using Influence.Domain.Entities;
 using AutoMapper;
+using Influence.Models;
 
 namespace Influence.Controllers
 {
@@ -17,27 +18,30 @@ namespace Influence.Controllers
     {
         private readonly IUserRepository _repository;
         private readonly InfluenceContext _context;
+        private readonly IMapper _mapper;
 
         public UsersController(IUserRepository repository, InfluenceContext context, IMapper mapper)
         {
             _repository = repository;
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<List<User>>> GetUsers()
+        public async Task<ActionResult<List<UserModel[]>>> GetUsers()
         {
             try
             {
                 var results = await _repository.GetAllUsersAsync();
 
-                return results;
+                UserModel[] models = _mapper.Map<UserModel[]>(results);
+
+                return Ok(models);
             }
             catch (Exception){
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
-            return await _context.Users.ToListAsync();
         }
 
         // GET: api/Users/5

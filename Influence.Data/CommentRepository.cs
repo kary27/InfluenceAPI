@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace Influence.Data
 {
-    public class PostRepository : IPostRepository
+    public class CommentRepository : ICommentRepository
     {
         private readonly InfluenceContext _context;
-        private readonly ILogger<UserRepository> _logger;
-
-        public PostRepository(InfluenceContext context, ILogger<UserRepository> logger)
-        {        
+        private readonly ILogger<PostRepository> _logger;
+        public CommentRepository(InfluenceContext context, ILogger<PostRepository> logger)
+        {
             _context = context;
             _logger = logger;
         }
@@ -26,7 +25,7 @@ namespace Influence.Data
         public void Delete(Post entity)
         {
             _logger.LogInformation($"Removing an object of type {entity.GetType()} to the context.");
-            _context.Add(entity);
+            _context.Remove(entity);
         }
 
         public async Task<bool> SaveChangesAsync()
@@ -37,14 +36,9 @@ namespace Influence.Data
             return (await _context.SaveChangesAsync()) > 0;
         }
 
-        public async Task<List<Post>> GetAllPostsAsync(bool includePosts = false)
+        public async Task<List<Comment>> GetAllCommentssAsync(bool includComments = false)
         {
-            return await _context.Posts.ToListAsync();
-        }
-
-        public async Task<Post> GetPostAsync(int id)
-        {
-            return await _context.Posts.FindAsync(id);
+            return await _context.Comments.ToListAsync();
         }
     }
 }

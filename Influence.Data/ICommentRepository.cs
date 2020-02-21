@@ -6,15 +6,14 @@ using System.Threading.Tasks;
 
 namespace Influence.Data
 {
-    public interface IPostRepository
+    public interface ICommentRepository
     {
         void Add(Post entity);
         void Delete(Post entity);
         Task<bool> SaveChangesAsync();
 
         //Post
-        Task<List<Post>> GetAllPostsAsync(bool includePosts = false);
-        Task<Post> GetPostAsync(int id);
+        Task<List<Comment>> GetAllCommentssAsync(bool includComments = false);
 
     }
 }

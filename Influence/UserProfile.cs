@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
+using Influence.Data.Models;
+using Influence.Domain.Entities;
 using Influence.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
 
 namespace Influence.Data
 {
@@ -10,7 +10,17 @@ namespace Influence.Data
     {
         public UserProfile()
         {
-            this.CreateMap<UserProfile, UserModel>();
+            this.CreateMap<User, UserModel>()
+                .ReverseMap();
+
+            this.CreateMap<Post, PostModel>()
+                .ReverseMap();
+
+
+            this.CreateMap<Comment, CommentModel>()
+                .ReverseMap();
+            this.CreateMap<Like, LikeModel>()
+               .ReverseMap();
         }
     }
 }

@@ -16,15 +16,15 @@ namespace Influence.Data
             _logger = logger;
         }
 
-        public void Add(Post entity)
+        public void Add(Comment entity)
         {
-            _logger.LogInformation($"Adding an object of type {entity.GetType()} to the context.");
+            _logger.LogInformation($"Adding a new comment to the context.");
             _context.Add(entity);
         }
 
-        public void Delete(Post entity)
+        public void Delete(Comment entity)
         {
-            _logger.LogInformation($"Removing an object of type {entity.GetType()} to the context.");
+            _logger.LogInformation($"Removing a comment from the context.");
             _context.Remove(entity);
         }
 
@@ -36,9 +36,19 @@ namespace Influence.Data
             return (await _context.SaveChangesAsync()) > 0;
         }
 
-        public async Task<List<Comment>> GetAllCommentssAsync(bool includComments = false)
+        public async Task<List<Comment>> GetAllCommentssAsync()
         {
             return await _context.Comments.ToListAsync();
+        }
+
+        public void Update(Comment entity)
+        {
+            _context.Entry(entity).State = EntityState.Modified;
+        }
+
+        public async Task<Comment> GetComment(int id)
+        {
+            return await _context.Comments.FindAsync(id);
         }
     }
 }

@@ -1,19 +1,19 @@
 ﻿using Influence.Domain.Entities;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Influence.Data
 {
     public interface ICommentRepository
     {
-        void Add(Post entity);
-        void Delete(Post entity);
+        void Add(Comment entity);
+        void Delete(Comment entity);
+        void Update(Comment entity);
         Task<bool> SaveChangesAsync();
 
-        //Post
-        Task<List<Comment>> GetAllCommentssAsync(bool includComments = false);
+        Task<List<Comment>> GetAllCommentssAsync();
+        Task<Comment> GetComment(int id);
+        
 
     }
 }

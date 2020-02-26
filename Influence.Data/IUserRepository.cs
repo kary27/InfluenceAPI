@@ -1,7 +1,5 @@
 ﻿using Influence.Domain.Entities;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Influence.Data
@@ -15,7 +13,10 @@ namespace Influence.Data
         //User
         Task<List<User>> GetAllUsersAsync(bool includPosts = false);
         Task<User> GetUserAsync(int id);
+
+        void UpdateUser(User user);
         //Task<User[]> GetAllUsersByEventDate(DateTime dateTime, bool includeTalks = false);
+        Task<User> GetUserByName(string username);
 
     }
 }

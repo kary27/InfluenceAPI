@@ -19,13 +19,13 @@ namespace Influence.Data
 
         public void Add(User entity)
         {
-            _logger.LogInformation($"Adding an object of type {entity.GetType()} to the context.");
+            _logger.LogInformation($"Adding a new user to the context.");
             _context.Add(entity);
         }
 
         public void Delete(User entity)
         {
-            _logger.LogInformation($"Removing an object of type {entity.GetType()} to the context.");
+            _logger.LogInformation($"Removing an user to the context.");
             _context.Remove(entity);
         }
 
@@ -45,6 +45,16 @@ namespace Influence.Data
         public async Task<User> GetUserAsync(int id)
         {
             return await _context.Users.FindAsync(id);
+        }
+
+        public void UpdateUser(User user)
+        {
+            _context.Entry(user).State = EntityState.Modified;
+        }
+
+        public async Task<User> GetUserByName(string username)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
         }
     }
 }

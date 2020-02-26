@@ -3,14 +3,16 @@ using Influence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Influence.Data.Migrations
 {
     [DbContext(typeof(InfluenceContext))]
-    partial class InfluenceContextModelSnapshot : ModelSnapshot
+    [Migration("20200226130833_addLikes")]
+    partial class addLikes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

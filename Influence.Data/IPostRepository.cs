@@ -10,11 +10,15 @@ namespace Influence.Data
     {
         void Add(Post entity);
         void Delete(Post entity);
+        void Update(Post entity);
         Task<bool> SaveChangesAsync();
 
         //Post
-        Task<List<Post>> GetAllPostsAsync(bool includePosts = false);
+        Task<List<Post>> GetAllPostsAsync();
         Task<Post> GetPostAsync(int id);
 
+        Task<List<Post>> GetAllPostsForUser(int userId);
+
+        Task<List<Post>> GetAllPostsWithComments();
     }
 }

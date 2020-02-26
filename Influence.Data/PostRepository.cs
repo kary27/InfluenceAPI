@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Influence.Data
@@ -19,13 +20,13 @@ namespace Influence.Data
 
         public void Add(Post entity)
         {
-            _logger.LogInformation($"Adding an object of type {entity.GetType()} to the context.");
+            _logger.LogInformation($"Adding a new post to the context.");
             _context.Add(entity);
         }
 
         public void Delete(Post entity)
         {
-            _logger.LogInformation($"Removing an object of type {entity.GetType()} to the context.");
+            _logger.LogInformation("Removing a post from the context.");
             _context.Add(entity);
         }
 
@@ -37,14 +38,33 @@ namespace Influence.Data
             return (await _context.SaveChangesAsync()) > 0;
         }
 
-        public async Task<List<Post>> GetAllPostsAsync(bool includePosts = false)
+        public async Task<List<Post>> GetAllPostsAsync()
         {
+            _logger.LogInformation("Return all posts");
             return await _context.Posts.ToListAsync();
         }
 
         public async Task<Post> GetPostAsync(int id)
         {
             return await _context.Posts.FindAsync(id);
+        }
+
+        public async Task<List<Post>> GetAllPostsForUser(int userId)
+        {
+            return await _context.Posts.Where(p => p.UserId == userId)
+                .Include(p=>p.Comments).ToListAsync();
+        }
+
+        public async Task<List<Post>> GetAllPostsWithComments()
+        {
+            return await _context.Posts
+                .Include(p => p.Comments)
+                .Include(p => p.Likes).ToListAsync();
+        }
+
+        public void Update(Post entity)
+        {
+            _context.Entry(entity).State = EntityState.Modified;
         }
     }
 }

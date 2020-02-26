@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
 using Influence.Data;
 using Influence.Domain.Entities;
-using AutoMapper;
 using Influence.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Influence.Controllers
 {
@@ -17,13 +15,11 @@ namespace Influence.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _repository;
-        private readonly InfluenceContext _context;
         private readonly IMapper _mapper;
 
-        public UsersController(IUserRepository repository, InfluenceContext context, IMapper mapper)
+        public UsersController(IUserRepository repository, IMapper mapper)
         {
             _repository = repository;
-            _context = context;
             _mapper = mapper;
         }
 
@@ -46,81 +42,129 @@ namespace Influence.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<UserModel>> GetUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
+            try
             {
-                return NotFound();
-            }
+                var user = await _repository.GetUserAsync(id);
 
-            return user;
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                return _mapper.Map<UserModel>(user);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         // PUT: api/Users/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<ActionResult<UserModel>> PutUser(int id, UserModel user)
         {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(user).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
+
+                if (id != user.Id)
+                {
+                    return BadRequest();
+                }
+
+                var currentUser = await _repository.GetUserAsync(id);
+                if (currentUser == null)
                 {
                     return NotFound();
                 }
-                else
+                _mapper.Map(user, currentUser);
+                _repository.UpdateUser(currentUser);
+                
+
+                if(await _repository.SaveChangesAsync())
                 {
-                    throw;
+                    return _mapper.Map<UserModel>(currentUser);
                 }
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
 
-            return NoContent();
+            return BadRequest();
         }
 
         // POST: api/Users
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<UserModel>> PostUser(UserModel user)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var userEntity = _mapper.Map<User>(user);
+                _repository.Add(userEntity);
+                if(await _repository.SaveChangesAsync())
+                {
+                    return  CreatedAtAction("GetUser", new { id = user.Id }, user);
+                }
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+
+            return BadRequest();
+        }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<UserModel>> DoLogin(UserModel user)
+        {
+            try
+            {
+                var existingUser = await _repository.GetUserByName(user.UserName);
+                if (existingUser == null)
+                {
+                    return NotFound();
+                }
+
+                return existingUser.Password == user.Password ? _mapper.Map<UserModel>(existingUser): null;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<User>> DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            try
             {
-                return NotFound();
+                var userEnitty = await _repository.GetUserAsync(id);
+                if(userEnitty == null)
+                {
+                    return NotFound($"The user with id {id} is not in the database");
+                }
+
+                _repository.Delete(userEnitty);
+                if (await _repository.SaveChangesAsync())
+                {
+                    return NoContent();
+                }
             }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+            return BadRequest();
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return user;
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.Users.Any(e => e.Id == id);
         }
     }
 }
